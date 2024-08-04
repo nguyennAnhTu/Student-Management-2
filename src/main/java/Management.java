@@ -1,6 +1,6 @@
 public interface Management {
-    void display(String s);
+    void display(String id);
     void add(Student student);
-    void delete(String s);
-    void update(String s);
+    void delete(String id);
+    void update(String id);
 }
