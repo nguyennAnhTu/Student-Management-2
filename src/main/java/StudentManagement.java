@@ -6,16 +6,16 @@ import java.util.Scanner;
 
 class StudentManagement implements Management {
     public boolean existedId(String id) {
-        Connection con = null;
+        Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         boolean exists = false;
 
         try {
-            con = DatabaseConfig.connect();
-            if (con != null) {
+            connection = DatabaseConfig.connect();
+            if (connection != null) {
                 String query = "SELECT 1 FROM student WHERE id = ?";
-                ps = con.prepareStatement(query);
+                ps = connection.prepareStatement(query);
                 ps.setString(1, id);
                 rs = ps.executeQuery();
                 exists = rs.next();
@@ -23,21 +23,20 @@ class StudentManagement implements Management {
         } catch (SQLException e) {
             System.out.println("Error checking ID existence: " + e.getMessage());
         } finally {
-            DatabaseConfig.closeResources(con, ps, rs);
+            DatabaseConfig.closeResources(connection, ps, rs);
         }
-
         return exists;
     }
 
     public void add(Student student) {
         if (!existedId(student.getId())) {
-            Connection con = null;
+            Connection connection = null;
             PreparedStatement ps = null;
 
             try {
-                con = DatabaseConfig.connect();
+                connection = DatabaseConfig.connect();
                 String query = "INSERT INTO student (id, name, age, gender) VALUES (?, ?, ?, ?)";
-                ps = con.prepareStatement(query);
+                ps = connection.prepareStatement(query);
                 ps.setString(1, student.getId());
                 ps.setString(2, student.getName());
                 ps.setInt(3, student.getAge());
@@ -47,7 +46,7 @@ class StudentManagement implements Management {
             } catch (SQLException e) {
                 System.out.println("Error adding student: " + e.getMessage());
             } finally {
-                DatabaseConfig.closeResources(con, ps, null);
+                DatabaseConfig.closeResources(connection, ps, null);
             }
         } else {
             System.out.println("Student already exists");
@@ -69,15 +68,15 @@ class StudentManagement implements Management {
 
     @Override
     public void displayById(String id) {
-        Connection con = null;
+        Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
-            con = DatabaseConfig.connect();
-            if (con != null) {
+            connection = DatabaseConfig.connect();
+            if (connection != null) {
                 String query = "SELECT * FROM student WHERE id = ?";
-                ps = con.prepareStatement(query);
+                ps = connection.prepareStatement(query);
                 ps.setString(1, id);
                 rs = ps.executeQuery();
                 if (rs.next()) {
@@ -89,20 +88,20 @@ class StudentManagement implements Management {
         } catch (SQLException e) {
             System.out.println("Error displaying student: " + e.getMessage());
         } finally {
-            DatabaseConfig.closeResources(con, ps, rs);
+            DatabaseConfig.closeResources(connection, ps, rs);
         }
     }
 
     public void displayListStudent() {
-        Connection con = null;
+        Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
-            con = DatabaseConfig.connect();
-            if (con != null) {
+            connection = DatabaseConfig.connect();
+            if (connection != null) {
                 String query = "SELECT * FROM student";
-                ps = con.prepareStatement(query);
+                ps = connection.prepareStatement(query);
                 rs = ps.executeQuery();
                 while (rs.next()) {
                     System.out.println(toString(rs));
@@ -111,7 +110,7 @@ class StudentManagement implements Management {
         } catch (SQLException e) {
             System.out.println("Error displaying students list: " + e.getMessage());
         } finally {
-            DatabaseConfig.closeResources(con, ps, rs);
+            DatabaseConfig.closeResources(connection, ps, rs);
         }
     }
 
@@ -127,14 +126,14 @@ class StudentManagement implements Management {
             System.out.print("Enter new gender: ");
             String gender = sc.nextLine();
 
-            Connection con = null;
+            Connection connection = null;
             PreparedStatement ps = null;
 
             try {
-                con = DatabaseConfig.connect();
-                if (con != null) {
+                connection = DatabaseConfig.connect();
+                if (connection != null) {
                     String query = "UPDATE student SET name = ?, age = ?, gender = ? WHERE id = ?";
-                    ps = con.prepareStatement(query);
+                    ps = connection.prepareStatement(query);
                     ps.setString(1, name);
                     ps.setInt(2, age);
                     ps.setString(3, gender);
@@ -145,7 +144,7 @@ class StudentManagement implements Management {
             } catch (SQLException e) {
                 System.out.println("Error updating student: " + e.getMessage());
             } finally {
-                DatabaseConfig.closeResources(con, ps, null);
+                DatabaseConfig.closeResources(connection, ps, null);
             }
         } else {
             System.out.println("Student does not exist");
@@ -155,15 +154,14 @@ class StudentManagement implements Management {
     @Override
     public void delete(String id) {
         if (existedId(id)) {
-            Connection con = null;
+            Connection connection = null;
             PreparedStatement ps = null;
 
             try {
-                con = DatabaseConfig.connect();
-                if (con != null) {
+                connection = DatabaseConfig.connect();
+                if (connection != null) {
                     String query = "DELETE FROM student WHERE id = ?";
-                    //tao query sql bang prepareStatement
-                    ps = con.prepareStatement(query);
+                    ps = connection.prepareStatement(query);
                     ps.setString(1, id);
                     ps.executeUpdate();
                     System.out.println("Student with Id: " + id + " deleted");
@@ -171,7 +169,7 @@ class StudentManagement implements Management {
             } catch (SQLException e) {
                 System.out.println("Error deleting student: " + e.getMessage());
             } finally {
-                DatabaseConfig.closeResources(con, ps, null);
+                DatabaseConfig.closeResources(connection, ps, null);
             }
         } else {
             System.out.println("Student does not exist");
