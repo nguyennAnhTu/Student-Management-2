@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 class StudentManagement implements Management {
-    public static boolean existedId(String id) {
+    public boolean existedId(String id) {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -68,7 +68,7 @@ class StudentManagement implements Management {
     }
 
     @Override
-    public void display(String id) {
+    public void displayById(String id) {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -162,6 +162,7 @@ class StudentManagement implements Management {
                 con = DatabaseConfig.connect();
                 if (con != null) {
                     String query = "DELETE FROM student WHERE id = ?";
+                    //tao query sql bang prepareStatement
                     ps = con.prepareStatement(query);
                     ps.setString(1, id);
                     ps.executeUpdate();

@@ -1,11 +1,27 @@
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
+import java.util.Properties;
 
 public class DatabaseConfig {
-    private static final String URL = "jdbc:postgresql://localhost:5432/Students";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "29082004";
+    public static final Properties properties = new Properties();
+
+    static {
+        try (InputStream input = DatabaseConfig.class.getClassLoader().getResourceAsStream("db.properties")) {
+            if (input == null) {
+                System.out.println("Sorry, unable to find db.properties");
+                System.exit(1);
+            }
+            properties.load(input);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static Connection connect() {
+        String URL = getDbUrl();
+        String USER = getDbUsername();
+        String PASSWORD = getDbPassword();
         try {
             return DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (SQLException e) {
@@ -22,5 +38,17 @@ public class DatabaseConfig {
         } catch (SQLException e) {
             System.out.println("Error closing resources: " + e.getMessage());
         }
+    }
+
+    public static String getDbUrl() {
+        return properties.getProperty("db.url");
+    }
+
+    public static String getDbUsername() {
+        return properties.getProperty("db.username");
+    }
+
+    public static String getDbPassword() {
+        return properties.getProperty("db.password");
     }
 }

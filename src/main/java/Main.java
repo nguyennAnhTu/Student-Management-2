@@ -54,7 +54,7 @@ public class Main {
                 case 3:
                     System.out.print("Enter student id: ");
                     Id = sc.nextLine();
-                    studentmanagement.display(Id);
+                    studentmanagement.displayById(Id);
                     break;
                 case 4:
                     System.out.print("Enter student id: ");
