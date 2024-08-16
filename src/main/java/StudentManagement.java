@@ -5,14 +5,15 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 class StudentManagement implements Management {
-    public boolean existedId(String id) {
+
+    public static boolean existedId(String id) {
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         boolean exists = false;
 
         try {
-            connection = DatabaseConfig.connect();
+            connection = DatabaseConfig.getInstance().connect();
             if (connection != null) {
                 String query = "SELECT 1 FROM student WHERE id = ?";
                 ps = connection.prepareStatement(query);
@@ -34,7 +35,7 @@ class StudentManagement implements Management {
             PreparedStatement ps = null;
 
             try {
-                connection = DatabaseConfig.connect();
+                connection = DatabaseConfig.getInstance().connect();
                 String query = "INSERT INTO student (id, name, age, gender) VALUES (?, ?, ?, ?)";
                 ps = connection.prepareStatement(query);
                 ps.setString(1, student.getId());
@@ -48,7 +49,8 @@ class StudentManagement implements Management {
             } finally {
                 DatabaseConfig.closeResources(connection, ps, null);
             }
-        } else {
+        }
+        else {
             System.out.println("Student already exists");
         }
     }
@@ -73,7 +75,7 @@ class StudentManagement implements Management {
         ResultSet rs = null;
 
         try {
-            connection = DatabaseConfig.connect();
+            connection = DatabaseConfig.getInstance().connect();
             if (connection != null) {
                 String query = "SELECT * FROM student WHERE id = ?";
                 ps = connection.prepareStatement(query);
@@ -98,7 +100,7 @@ class StudentManagement implements Management {
         ResultSet rs = null;
 
         try {
-            connection = DatabaseConfig.connect();
+            connection = DatabaseConfig.getInstance().connect();
             if (connection != null) {
                 String query = "SELECT * FROM student";
                 ps = connection.prepareStatement(query);
@@ -130,7 +132,7 @@ class StudentManagement implements Management {
             PreparedStatement ps = null;
 
             try {
-                connection = DatabaseConfig.connect();
+                connection = DatabaseConfig.getInstance().connect();
                 if (connection != null) {
                     String query = "UPDATE student SET name = ?, age = ?, gender = ? WHERE id = ?";
                     ps = connection.prepareStatement(query);
@@ -158,7 +160,7 @@ class StudentManagement implements Management {
             PreparedStatement ps = null;
 
             try {
-                connection = DatabaseConfig.connect();
+                connection = DatabaseConfig.getInstance().connect();
                 if (connection != null) {
                     String query = "DELETE FROM student WHERE id = ?";
                     ps = connection.prepareStatement(query);
