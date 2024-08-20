@@ -5,7 +5,12 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 class StudentManagement implements Management {
-
+    private static final String existQuery = "SELECT 1 FROM student WHERE id = ?";
+    private static final String insertQuery = "INSERT INTO student (id, name, age, gender) VALUES (?, ?, ?, ?)";
+    private static final String selectQuery = "SELECT * FROM student WHERE id = ?";
+    private static final String deleteQuery = "DELETE FROM student WHERE id = ?";
+    private static final String selectAllQuery = "SELECT * FROM student";
+    private static final String updateQuery = "UPDATE student SET name = ?, age = ?, gender = ? WHERE id = ?";
     public static boolean existedId(String id) {
         Connection connection = null;
         PreparedStatement ps = null;
@@ -15,8 +20,7 @@ class StudentManagement implements Management {
         try {
             connection = DatabaseConfig.getInstance().connect();
             if (connection != null) {
-                String query = "SELECT 1 FROM student WHERE id = ?";
-                ps = connection.prepareStatement(query);
+                ps = connection.prepareStatement(existQuery);
                 ps.setString(1, id);
                 rs = ps.executeQuery();
                 exists = rs.next();
@@ -36,14 +40,18 @@ class StudentManagement implements Management {
 
             try {
                 connection = DatabaseConfig.getInstance().connect();
-                String query = "INSERT INTO student (id, name, age, gender) VALUES (?, ?, ?, ?)";
-                ps = connection.prepareStatement(query);
-                ps.setString(1, student.getId());
-                ps.setString(2, student.getName());
-                ps.setInt(3, student.getAge());
-                ps.setString(4, student.getGender());
-                ps.executeUpdate();
-                System.out.println("Student added successfully.");
+                if (connection != null) {
+                    DatabaseConfig.getInstance().beginTransaction(connection);
+                    ps = connection.prepareStatement(insertQuery);
+                    ps.setString(1, student.getId());
+                    ps.setString(2, student.getName());
+                    ps.setInt(3, student.getAge());
+                    ps.setString(4, student.getGender());
+                    ps.executeUpdate();
+
+                    DatabaseConfig.getInstance().commitTransaction(connection);
+                    System.out.println("Student added successfully.");
+                }
             } catch (SQLException e) {
                 System.out.println("Error adding student: " + e.getMessage());
             } finally {
@@ -77,8 +85,7 @@ class StudentManagement implements Management {
         try {
             connection = DatabaseConfig.getInstance().connect();
             if (connection != null) {
-                String query = "SELECT * FROM student WHERE id = ?";
-                ps = connection.prepareStatement(query);
+                ps = connection.prepareStatement(selectQuery);
                 ps.setString(1, id);
                 rs = ps.executeQuery();
                 if (rs.next()) {
@@ -102,8 +109,7 @@ class StudentManagement implements Management {
         try {
             connection = DatabaseConfig.getInstance().connect();
             if (connection != null) {
-                String query = "SELECT * FROM student";
-                ps = connection.prepareStatement(query);
+                ps = connection.prepareStatement(selectAllQuery);
                 rs = ps.executeQuery();
                 while (rs.next()) {
                     System.out.println(toString(rs));
@@ -134,16 +140,19 @@ class StudentManagement implements Management {
             try {
                 connection = DatabaseConfig.getInstance().connect();
                 if (connection != null) {
-                    String query = "UPDATE student SET name = ?, age = ?, gender = ? WHERE id = ?";
-                    ps = connection.prepareStatement(query);
+                    DatabaseConfig.getInstance().beginTransaction(connection);
+                    ps = connection.prepareStatement(updateQuery);
                     ps.setString(1, name);
                     ps.setInt(2, age);
                     ps.setString(3, gender);
                     ps.setString(4, id);
                     ps.executeUpdate();
+
+                    DatabaseConfig.getInstance().commitTransaction(connection);
                     System.out.println("Student with Id: " + id + " updated");
                 }
             } catch (SQLException e) {
+                DatabaseConfig.getInstance().rollbackTransaction(connection);
                 System.out.println("Error updating student: " + e.getMessage());
             } finally {
                 DatabaseConfig.closeResources(connection, ps, null);
@@ -162,13 +171,16 @@ class StudentManagement implements Management {
             try {
                 connection = DatabaseConfig.getInstance().connect();
                 if (connection != null) {
-                    String query = "DELETE FROM student WHERE id = ?";
-                    ps = connection.prepareStatement(query);
+                    DatabaseConfig.getInstance().beginTransaction(connection);
+                    ps = connection.prepareStatement(deleteQuery);
                     ps.setString(1, id);
                     ps.executeUpdate();
+
+                    DatabaseConfig.getInstance().commitTransaction(connection);
                     System.out.println("Student with Id: " + id + " deleted");
                 }
             } catch (SQLException e) {
+                DatabaseConfig.getInstance().rollbackTransaction(connection);
                 System.out.println("Error deleting student: " + e.getMessage());
             } finally {
                 DatabaseConfig.closeResources(connection, ps, null);

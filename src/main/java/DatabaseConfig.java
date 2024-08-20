@@ -37,7 +37,7 @@ public class DatabaseConfig {
         }
     }
 
-    public static Connection connect() {
+    public Connection connect() {
         try {
             return dataSource.getConnection();
         } catch (SQLException e) {
@@ -45,7 +45,6 @@ public class DatabaseConfig {
             return null;
         }
     }
-
 
     public static DatabaseConfig getInstance() {
         if (instance == null) {
@@ -56,6 +55,28 @@ public class DatabaseConfig {
             }
         }
         return instance;
+    }
+
+    public void beginTransaction(Connection con) throws SQLException {
+        if (con != null) {
+            con.setAutoCommit(false);
+        }
+    }
+
+    public void commitTransaction(Connection con) throws SQLException {
+        if (con != null) {
+            con.commit();
+        }
+    }
+
+    public void rollbackTransaction(Connection con) {
+        if (con != null) {
+            try {
+                con.rollback();
+            } catch (SQLException e) {
+                System.out.println("Error during transaction rollback: " + e.getMessage());
+            }
+        }
     }
 
     public static void closeResources(Connection con, PreparedStatement ps, ResultSet rs) {
